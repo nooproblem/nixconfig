@@ -1,0 +1,41 @@
+This patch is based on the patch suggested in:
+https://github.com/raspberrypi/firmware/issues/1499
+
+https://github.com/agherzan/meta-raspberrypi/blob/dunfell/recipes-bsp/u-boot/files/0001-dm-core-Move-ofdata_to_platdata-call-earlier.patch
+
+But that patch didn't apply for me and the code in the version of
+uboot that I was looking at did look quite different. So I've
+re-worked the patch here and hope it works :)
+
+diff --git a/drivers/core/device.c b/drivers/core/device.c
+index 355dbd14..8447e13e 100644
+--- a/drivers/core/device.c
++++ b/drivers/core/device.c
+@@ -386,13 +386,6 @@ int device_ofdata_to_platdata(struct udevice *dev)
+ 		}
+ 	}
+
+-	if (drv->ofdata_to_platdata &&
+-	    (CONFIG_IS_ENABLED(OF_PLATDATA) || dev_has_of_node(dev))) {
+-		ret = drv->ofdata_to_platdata(dev);
+-		if (ret)
+-			goto fail;
+-	}
+-
+ 	dev->flags |= DM_FLAG_PLATDATA_VALID;
+
+ 	return 0;
+@@ -437,6 +430,13 @@ int device_probe(struct udevice *dev)
+ 			return 0;
+ 	}
+
++	if (drv->ofdata_to_platdata &&
++	    (CONFIG_IS_ENABLED(OF_PLATDATA) || dev_has_of_node(dev))) {
++		ret = drv->ofdata_to_platdata(dev);
++		if (ret)
++			goto fail;
++	}
++
+ 	seq = uclass_resolve_seq(dev);
+ 	if (seq < 0) {
+ 		ret = seq;

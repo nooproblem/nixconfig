@@ -20,6 +20,25 @@ in
     (self: super: {
       makeModulesClosure = x: super.makeModulesClosure (x // { allowMissing = true; });
     })
+
+    # Attempt to patch UBoot to make it possible to use GPIO.
+    (self: super: {
+      ubootRaspberryPiZero = self.buildUBoot {
+        defconfig = "rpi_0_w_defconfig";
+        extraMeta.platforms = [ "armv6l-linux" ];
+        filesToInstall = [ "u-boot.bin" ];
+
+        version = "2020.10";
+        src = pkgs.fetchurl {
+          url = "ftp://ftp.denx.de/pub/u-boot/u-boot-2020.10.tar.bz2";
+          sha256 = "08m6f1bh4pdcqbxf983qdb66ccd5vak5cbzc114yf3jwq2yinj0d";
+        };
+
+        extraPatches = [
+          ./0001-uboot-patch.patch
+        ];
+      };
+    })
   ];
 
   # The NixOS release to be compatible with for stateful data such as databases.
