@@ -68,4 +68,58 @@ in
     openssh.authorizedKeys.keys = keys.etu.computers;
   };
   users.users.root.openssh.authorizedKeys.keys = keys.etu.computers;
+
+  # Enable the mmdvmhost service.
+  services.mmdvmhost.enable = true;
+  services.mmdvmhost.settings = let
+    DMRId = "2400302";
+    HSDMRId = "${DMRId}02";
+  in {
+    General = {
+      Callsign = "SA0BSE";
+      Id = HSDMRId;
+      Timeout = 240;
+      Duplex = 0;
+      RFModeHang = 300;
+      NetModeHang = 300;
+      Display = "OLED";
+      Daemon = 1;
+    };
+    Info = {
+      RXFrequency = 433012500;
+      TXFrequency = 433012500;
+      Latitude = 59.355755;
+      Longitude = 17.883849;
+      Location = "Stockholm, JO89wi";
+      Description = "MMDVMHost on NixOS";
+      URL = "https://sa.0b.se/";
+    };
+    Modem = {
+      UARTPort = "/dev/ttyS1";
+      UARTSpeed = 115200;
+      RXOffset = 7;
+      TXOffset = 7;
+      Debug = 1;
+    };
+    DMR = {
+      Enable = 1;
+      Id = HSDMRId;
+      Debug = 1;
+    };
+    "DMR Network" = {
+      Enable = 1;
+      Type = "Direct";
+      RemoteAddress = "83.233.234.102";
+      Password = "BrandmeisterPassword";
+      Slot1 = 0;
+      Debug = 1;
+    };
+    "TFT Serial".Port = "/dev/ttyS1";
+    Nextion.ScreenLayout = 0;
+    Nextion.Port = "/dev/ttyS1";
+    OLED = {
+      Scroll = 0;
+      LogoScreensaver = 0;
+    };
+  };
 }
