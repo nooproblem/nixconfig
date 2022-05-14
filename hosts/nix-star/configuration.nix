@@ -7,6 +7,9 @@
 let
   # Import my ssh public keys
   keys = import ../../data/pubkeys.nix;
+
+  # Load some secrets to include
+  secrets = import ../../data/load-secrets.nix;
 in
 {
   imports = [
@@ -55,7 +58,8 @@ in
   # Enable wireless networking.
   networking.wireless.enable = true;
   networking.wireless.interfaces = [ "wlan0" ];
-  networking.wireless.networks.SSID.psk = "PASSWORD";
+  # networking.wireless.networks."SSID".psk = "PASSWORD";
+  networking.wireless.networks = secrets.nix-star.wifis;
 
   # Create users.
   users.mutableUsers = false;
@@ -86,11 +90,9 @@ in
       Daemon = 1;
     };
     Info = {
+      inherit (secrets.nix-star.mmdvm.Info) Latitude Longitude Location;
       RXFrequency = 433012500;
       TXFrequency = 433012500;
-      Latitude = 59.355755;
-      Longitude = 17.883849;
-      Location = "Stockholm, JO89wi";
       Description = "MMDVMHost on NixOS";
       URL = "https://sa.0b.se/";
     };
@@ -107,10 +109,10 @@ in
       Debug = 1;
     };
     "DMR Network" = {
+      inherit (secrets.nix-star.mmdvm."DMR Network") Password;
       Enable = 1;
       Type = "Direct";
       RemoteAddress = "83.233.234.102";
-      Password = "BrandmeisterPassword";
       Slot1 = 0;
       Debug = 1;
     };
